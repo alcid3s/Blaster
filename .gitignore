@@ -4,7 +4,13 @@ Build
 Config
 Content/__ExternalActors__
 Content/__ExternalObjects__
-Content/Assets
+
+Content/Assets/Animations
+Content/Assets/Characters
+Content/Assets/LearningKit_Games
+Content/Assets/MilitaryWeapSilver
+Content/Assets/Mixamo
+
 Content/Collections
 Content/Developers
 
