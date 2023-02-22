@@ -41,7 +41,7 @@ protected:
 private:
 	class ABlasterCharacter* Character;
 
-	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon, EditAnywhere);
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon);
 	AWeapon* EquippedWeapon;
 
 	UPROPERTY(Replicated);

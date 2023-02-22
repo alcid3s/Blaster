@@ -274,7 +274,7 @@ void ABlasterCharacter::FireButtonReleased()
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AO_Yaw: %f and TurnInPlace: %s"), AO_Yaw, *UEnum::GetValueAsString(TurningInPlace));
+	// UE_LOG(LogTemp, Warning, TEXT("AO_Yaw: %f and TurnInPlace: %s"), AO_Yaw, *UEnum::GetValueAsString(TurningInPlace));
 	if (AO_Yaw > 90.f)
 	{
 		TurningInPlace = ETurningInPlace::ETIP_Right;
