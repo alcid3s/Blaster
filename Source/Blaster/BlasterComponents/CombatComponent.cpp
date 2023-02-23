@@ -20,6 +20,17 @@ UCombatComponent::UCombatComponent()
 	AimWalkSpeed = 450.f;
 }
 
+/*
+	Replicated variables.
+*/
+void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UCombatComponent, bAiming);
+}
+
 // Called when the game starts
 void UCombatComponent::BeginPlay()
 {
@@ -67,9 +78,38 @@ void UCombatComponent::OnRep_EquippedWeapon()
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed = bPressed;
-	if (EquippedWeapon == nullptr) return;
-	if (Character && bFireButtonPressed)
+
+	if (bFireButtonPressed)
 	{
+		/*
+		* Making the weapon of this specific character fire on the server.
+		* The reason for not replication bFireButtonPressed is because some weapons have automatic fire.
+		* This makes the bFireButtonPressed true for a longer period of time.
+		*/
+		ServerRPCFire();
+	}
+	
+}
+
+/*
+	Server RPC, client calls this function, executes on server.
+	Server calls function, executes on server.
+*/
+void UCombatComponent::ServerRPCFire_Implementation()
+{
+	MulticastFire();
+}
+
+/*
+	Multicast RPC, when this function is called,
+	the code will be executed an all clients and the server.
+*/
+void UCombatComponent::MulticastFire_Implementation()
+{
+	if (EquippedWeapon == nullptr) return;
+	if (Character)
+	{
+		// bAiming is replicated so all clients know this variable.
 		Character->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire();
 	}
@@ -98,12 +138,4 @@ void UCombatComponent::EquipWeapon(class AWeapon* WeaponToEquip)
 	EquippedWeapon->ShowPickupWidget(false);
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	Character->bUseControllerRotationYaw = true;
-}
-
-void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
-	DOREPLIFETIME(UCombatComponent, bAiming);
 }
