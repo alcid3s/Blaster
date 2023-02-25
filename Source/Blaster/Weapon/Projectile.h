@@ -26,8 +26,19 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* CollisionBox;
 
+	/*
+		L76 Movement for projectile
+	*/
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
+
+	/*
+		L77 Tracer for bullet
+	*/
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* Tracer;
+
+	class UParticleSystemComponent* TracerComponent;
 
 public:	
 
