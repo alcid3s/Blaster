@@ -85,12 +85,14 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 	if (bFireButtonPressed)
 	{
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
 		/*
 		* Making the weapon of this specific character fire on the server.
 		* The reason for not replication bFireButtonPressed is because some weapons have automatic fire.
 		* This makes the bFireButtonPressed true for a longer period of time.
 		*/
-		ServerRPCFire();
+		ServerRPCFire(HitResult.ImpactPoint);
 	}
 
 }
@@ -135,18 +137,16 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		if (!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint = End;
-			HitTarget = End;
 		}
 		else
 		{
-			HitTarget = TraceHitResult.ImpactPoint;
-			DrawDebugSphere(
-				GetWorld(),
-				TraceHitResult.ImpactPoint,
-				12.f,
-				12,
-				FColor::Red
-			);
+			//DrawDebugSphere(
+			//	GetWorld(),
+			//	TraceHitResult.ImpactPoint,
+			//	12.f,
+			//	12,
+			//	FColor::Red
+			//);
 		}
 	}
 }
@@ -155,23 +155,23 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 	Server RPC, client calls this function, executes on server.
 	Server calls function, executes on server.
 */
-void UCombatComponent::ServerRPCFire_Implementation()
+void UCombatComponent::ServerRPCFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	MulticastFire();
+	MulticastFire(TraceHitTarget);
 }
 
 /*
 	Multicast RPC, when this function is called,
 	the code will be executed an all clients and the server.
 */
-void UCombatComponent::MulticastFire_Implementation()
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if (EquippedWeapon == nullptr) return;
 	if (Character)
 	{
 		// bAiming is replicated so all clients know this variable.
 		Character->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire(HitTarget);
+		EquippedWeapon->Fire(TraceHitTarget);
 	}
 }
 
@@ -179,8 +179,6 @@ void UCombatComponent::MulticastFire_Implementation()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	FHitResult HitResult;
-	TraceUnderCrosshairs(HitResult);
 
 	// ...
 }
