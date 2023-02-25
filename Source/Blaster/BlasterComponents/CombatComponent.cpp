@@ -9,12 +9,16 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+// Lecture 74
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	BaseWalkSpeed = 600.f;
 	AimWalkSpeed = 450.f;
@@ -40,7 +44,7 @@ void UCombatComponent::BeginPlay()
 	{
 		Character->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	}
-	
+
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)
@@ -88,7 +92,61 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 		*/
 		ServerRPCFire();
 	}
-	
+
+}
+
+void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
+{
+	FVector2D ViewportSize;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	/*
+		Now we get the viewport of screenspace (middle of your screen). But we need it in worldspace.
+	*/
+	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection
+	);
+
+	if (bScreenToWorld)
+	{
+		// Start, usually the weapon the projectile would come from.
+		FVector Start = CrosshairWorldPosition;
+
+		// End, the end of where the line trace stops, if it hit something on the way, see LineTraceSingleByChannel :).
+		FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
+
+		GetWorld()->LineTraceSingleByChannel(
+			TraceHitResult,
+			Start,
+			End,
+			ECollisionChannel::ECC_Visibility
+		);
+		if (!TraceHitResult.bBlockingHit)
+		{
+			TraceHitResult.ImpactPoint = End;
+		}
+		else
+		{
+			DrawDebugSphere(
+				GetWorld(),
+				TraceHitResult.ImpactPoint,
+				12.f,
+				12,
+				FColor::Red
+			);
+		}
+	}
 }
 
 /*
@@ -119,6 +177,8 @@ void UCombatComponent::MulticastFire_Implementation()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	FHitResult HitResult;
+	TraceUnderCrosshairs(HitResult);
 
 	// ...
 }
