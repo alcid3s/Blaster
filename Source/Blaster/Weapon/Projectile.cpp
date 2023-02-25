@@ -6,6 +6,9 @@
 // Lecture 70
 #include "Components/BoxComponent.h"
 
+// Lecture 76
+#include "GameFramework/ProjectileMovementComponent.h"
+
 // Sets default values
 AProjectile::AProjectile()
 {
@@ -23,6 +26,9 @@ AProjectile::AProjectile()
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 
+	// movement of bullet
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 }
 
 // Called when the game starts or when spawned
