@@ -11,6 +11,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 {
 	Super::Fire(HitTarget);
 
+	if (!HasAuthority()) return;
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
 	/*
 		getting muzzle flash socket from Assault rifle
