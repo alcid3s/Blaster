@@ -14,14 +14,28 @@ class BLASTER_API ACasing : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACasing();
-private:
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* CasingMesh;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* CasingMesh;
+
+	UPROPERTY(EditAnywhere);
+	float ShellEjectionImpulse;
+
+	UPROPERTY(EditAnywhere);
+	class USoundCue* ShellSound;
+
+	UPROPERTY(EditAnywhere)
+	FTimerHandle TimerHandle;
+
+	void AwaitDestroy();
 
 public:	
 
