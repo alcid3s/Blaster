@@ -31,6 +31,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 	void ShowPickupWidget(bool bShowWidget);
+	virtual void Fire(const FVector& HitTarget);
 
 protected:
 	// Called when the game starts or when spawned
@@ -69,6 +70,13 @@ private:
 	// pickup widget
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 		class UWidgetComponent* PickupWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon properties")
+	class UAnimationAsset* FireAnimation;
+
+	// Lecture 80
+	UPROPERTY(Editanywhere)
+	TSubclassOf<class ACasing> CasingClass;
 public:
 	void SetWeaponState(EWeaponState State);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }

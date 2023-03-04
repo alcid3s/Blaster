@@ -8,6 +8,16 @@
 
 #include "Net/UnrealNetwork.h"
 
+// Lecture 72
+#include "Animation/AnimationAsset.h"
+#include "Components/SkeletalMeshComponent.h"
+
+// Lecture 80
+#include "Casing.h"
+
+// From projectileWeapon.cpp
+#include "Engine/SkeletalMeshSocket.h"
+
 // Sets default values
 AWeapon::AWeapon()
 {
@@ -117,6 +127,33 @@ void AWeapon::ShowPickupWidget(bool bShowWidget)
 	if (PickupWidget)
 	{
 		PickupWidget->SetVisibility(bShowWidget);
+	}
+}
+
+void AWeapon::Fire(const FVector& HitTarget)
+{
+	if (FireAnimation)
+	{
+		WeaponMesh->PlayAnimation(FireAnimation, false);
+	}
+
+	// Lecture 80
+	if (CasingClass)
+	{
+		const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject"));
+		if (AmmoEjectSocket)
+		{
+			FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+
+			/* basics of spawning an actor*/
+			UWorld* World = GetWorld();
+			if (World)
+			{
+				World->SpawnActor<ACasing>(CasingClass, 
+					SocketTransform.GetLocation(), 
+					SocketTransform.GetRotation().Rotator());
+			}
+		}
 	}
 }
 
