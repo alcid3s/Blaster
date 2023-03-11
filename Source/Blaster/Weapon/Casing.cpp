@@ -21,6 +21,7 @@ ACasing::ACasing()
 	CasingMesh->SetEnableGravity(true);
 	CasingMesh->SetNotifyRigidBodyCollision(true);
 	ShellEjectionImpulse = 10.f;
+	CaseDecomposition = 4.f;
 }
 
 // Called when the game starts or when spawned
@@ -38,7 +39,7 @@ void ACasing::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ShellSound, GetActorLocation());
 	}
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &ACasing::AwaitDestroy, 5.0f, true);
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ACasing::AwaitDestroy, CaseDecomposition, true);
 }
 
 void ACasing::AwaitDestroy()

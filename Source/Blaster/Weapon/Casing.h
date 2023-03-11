@@ -35,6 +35,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	FTimerHandle TimerHandle;
 
+	UPROPERTY(EditAnywhere)
+	float CaseDecomposition;
+
 	void AwaitDestroy();
 
 public:	
