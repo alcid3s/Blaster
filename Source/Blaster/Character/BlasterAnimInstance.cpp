@@ -81,5 +81,25 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		// LeftHandTransform is used in FABRIK state machine in animBP
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
+
+		/* Lecture 86 */
+		if (BlasterCharacter->IsLocallyControlled())
+		{
+			bLocallyControlled = true;
+			FTransform RightHandTransform = BlasterCharacter->GetMesh()->
+				GetSocketTransform(FName("Hand_R"), 
+					ERelativeTransformSpace::RTS_World);
+
+			RightHandRotation = 
+				UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(),
+				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - BlasterCharacter->GetHitTarget()));
+
+		}
+		
+		/* Lecture 86 */
+		FTransform MuzzleTipTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("MuzzleFlash"), ERelativeTransformSpace::RTS_World);
+		FVector MuzzleX(FRotationMatrix(MuzzleTipTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::X));
+		DrawDebugLine(GetWorld(), MuzzleTipTransform.GetLocation(), MuzzleTipTransform.GetLocation() + MuzzleX * 1000.f, FColor::Red);
+		DrawDebugLine(GetWorld(), MuzzleTipTransform.GetLocation(), BlasterCharacter->GetHitTarget(), FColor::Orange);
 	}
 }

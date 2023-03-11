@@ -54,8 +54,13 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	SetHUDCrosshairs(DeltaTime);
+	if (Character && Character->IsLocallyControlled())
+	{
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		HitTarget = HitResult.ImpactPoint;
+	}
 }
 
 // Lecture 83
@@ -86,12 +91,12 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 				HUDPackage.CrosshairsBottom = nullptr;
 				HUDPackage.CrosshairsTop = nullptr;
 			}
+
 			/* Calculate crosshair spread L85*/
 			FVector2D WalkSpeedRange(0.f, Character->GetCharacterMovement()->MaxWalkSpeed);
 			FVector2D VelocityMultiplierRange(0.f, 1.f);
 			FVector Velocity = Character->GetVelocity();
 			Velocity.Z = 0.f;
-
 
 			CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(WalkSpeedRange, VelocityMultiplierRange, Velocity.Size());
 
@@ -104,7 +109,6 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime, 30.f);
 			}
 			HUDPackage.CrosshairSpread = CrosshairVelocityFactor + CrosshairInAirFactor;
-
 
 			HUD->SetHUDPackage(HUDPackage);
 		}
@@ -122,7 +126,6 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 		}
 		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
 	}
-
 }
 
 void UCombatComponent::ServerSetAimingRPC_Implementation(bool bIsAiming)
@@ -158,7 +161,6 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 		*/
 		ServerRPCFire(HitResult.ImpactPoint);
 	}
-
 }
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
