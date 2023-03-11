@@ -21,7 +21,7 @@ ACasing::ACasing()
 	CasingMesh->SetEnableGravity(true);
 	CasingMesh->SetNotifyRigidBodyCollision(true);
 	ShellEjectionImpulse = 10.f;
-	CaseDecomposition = 4.f;
+	CaseDecomposition = 3.f;
 }
 
 // Called when the game starts or when spawned
