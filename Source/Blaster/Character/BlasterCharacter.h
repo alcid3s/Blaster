@@ -5,11 +5,17 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Blaster/BlasterTypes/TurningInPlace.h"
+
+// L89
+#include "Blaster/Interfaces/InteractWithCrosshairsInterface.h"
+
+// last header to include
 #include "BlasterCharacter.generated.h"
 
 
+
 UCLASS()
-class BLASTER_API ABlasterCharacter : public ACharacter
+class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
