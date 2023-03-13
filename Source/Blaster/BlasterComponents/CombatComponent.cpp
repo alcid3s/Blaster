@@ -241,6 +241,14 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		// Start, usually the weapon the projectile would come from.
 		FVector Start = CrosshairWorldPosition;
 
+		// L90 Fix trace from camera
+		if (Character)
+		{
+			float DistanceToCharacter = (Character->GetActorLocation() - Start).Size();
+			Start += CrosshairWorldDirection * (DistanceToCharacter + 100.f);
+			// DrawDebugSphere(GetWorld(), Start, 16.f, 12, FColor::Red, false);
+		}
+
 		// End, the end of where the line trace stops, if it hit something on the way, see LineTraceSingleByChannel :).
 		FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
 
