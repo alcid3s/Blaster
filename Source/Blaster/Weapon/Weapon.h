@@ -56,7 +56,7 @@ public:
 		Zoomed FOV while aiming L87
 	*/
 	UPROPERTY(EditAnywhere)
-	float ZoomedFOV = 30.f;
+	float ZoomedFOV = 50.f;
 
 	UPROPERTY(EditAnywhere)
 	float ZoomInterpSpeed = 20.f;
