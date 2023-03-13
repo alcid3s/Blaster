@@ -80,6 +80,10 @@ private:
 
 	FVector HitTarget;
 
+	// L88
+	float CrosshairAimFactor;
+	float CrosshairShootingFactor;
+
 	/*
 		Aiming and FOV L87
 	*/
