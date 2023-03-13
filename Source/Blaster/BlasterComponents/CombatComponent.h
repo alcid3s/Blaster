@@ -4,7 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+
+// L89
+#include "Blaster/HUD/BlasterHUD.h"
+
+// last header to include
 #include "CombatComponent.generated.h"
+
 
 // Lecture 74
 #define TRACE_LENGTH 80000.f
@@ -83,6 +90,9 @@ private:
 	// L88
 	float CrosshairAimFactor;
 	float CrosshairShootingFactor;
+
+	// L89
+	FHUDPackage HUDPackage;
 
 	/*
 		Aiming and FOV L87

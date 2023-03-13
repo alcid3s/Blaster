@@ -90,9 +90,12 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 				GetSocketTransform(FName("Hand_R"), 
 					ERelativeTransformSpace::RTS_World);
 
-			RightHandRotation = 
+			FRotator LookAtRotation = 
 				UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(),
 				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - BlasterCharacter->GetHitTarget()));
+
+			// L89
+			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaTime, 30.f);
 
 		}
 		
