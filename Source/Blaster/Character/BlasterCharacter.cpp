@@ -19,6 +19,9 @@
 // Lecture 71
 #include "BlasterAnimInstance.h"
 
+// Lecture 91
+#include "Blaster/Blaster.h"
+
 // Sets default values
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -51,6 +54,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	// Lecture 89
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+
+	// Lecture 91
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 
 	// Lecture 66
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 850.f);
@@ -129,6 +135,18 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+void ABlasterCharacter::PlayHitReactMontage()
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage)
+	{
+		AnimInstance->Montage_Play(HitReactMontage);
+		FName SectionName("FromFront");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
 void ABlasterCharacter::MoveForward(float Value)
 {
 	if (Controller != nullptr && Value != 0.f)
@@ -180,6 +198,11 @@ void ABlasterCharacter::ServerEquipButtonPressed_Implementation()
 	{
 		Combat->EquipWeapon(OverlappingWeapon);
 	}
+}
+
+void ABlasterCharacter::MulticastHit_Implementation()
+{
+	PlayHitReactMontage();
 }
 
 void ABlasterCharacter::HideCameraIfCharacterClose()
