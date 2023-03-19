@@ -57,6 +57,8 @@ void UCombatComponent::BeginPlay()
 			CurrentFOV = DefaultFOV;
 		}
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("bCanFire: %s"), bCanFire ? "t" : "f");
 }
 
 // Called every frame
@@ -159,6 +161,46 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 	}
 }
 
+void UCombatComponent::StartFireTimer()
+{
+	if (EquippedWeapon == nullptr || Character == nullptr) return;
+	Character->GetWorldTimerManager().SetTimer(
+		FireTimer,
+		this,
+		&UCombatComponent::FireTimerFinished,
+		EquippedWeapon->FireDelay
+	);
+}
+
+void UCombatComponent::FireTimerFinished()
+{
+	if (EquippedWeapon == nullptr) return;
+	bCanFire = true;
+	if (bFireButtonPressed && EquippedWeapon->bAutomatic)
+	{
+		Fire();
+	}
+}
+
+// L93
+void UCombatComponent::Fire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("bCanFire: %s"), bCanFire ? "t" : "f");
+	if (bCanFire)
+	{
+		bCanFire = false;
+		ServerRPCFire(HitTarget);
+
+		// L88
+		if (EquippedWeapon)
+		{
+			CrosshairShootingFactor += 0.75f;
+		}
+		StartFireTimer();
+	}
+}
+
+
 void UCombatComponent::SetAiming(bool bIsAiming)
 {
 	bAiming = bIsAiming;
@@ -196,20 +238,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 	if (bFireButtonPressed)
 	{
-		FHitResult HitResult;
-		TraceUnderCrosshairs(HitResult);
-
-		// L88
-		if (EquippedWeapon)
-		{
-			CrosshairShootingFactor += 0.75f;
-		}
-		/*
-		* Making the weapon of this specific character fire on the server.
-		* The reason for not replication bFireButtonPressed is because some weapons have automatic fire.
-		* This makes the bFireButtonPressed true for a longer period of time.
-		*/
-		ServerRPCFire(HitResult.ImpactPoint);
+		Fire();
 	}
 }
 
@@ -322,4 +351,5 @@ void UCombatComponent::EquipWeapon(class AWeapon* WeaponToEquip)
 	EquippedWeapon->ShowPickupWidget(false);
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	Character->bUseControllerRotationYaw = true;
+	bCanFire = true;
 }

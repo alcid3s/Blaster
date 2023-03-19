@@ -9,6 +9,9 @@
 // L89
 #include "Blaster/HUD/BlasterHUD.h"
 
+// Lecture 93
+#include "TimerManager.h"
+
 // last header to include
 #include "CombatComponent.generated.h"
 
@@ -46,6 +49,8 @@ protected:
 	void OnRep_EquippedWeapon();
 
 	void FireButtonPressed(bool bPressed);
+
+	void Fire();
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPCFire(const FVector_NetQuantize& TraceHitTarget);
@@ -110,6 +115,15 @@ private:
 	float ZoomInterpSpeed = 20.f;
 
 	void InterpFOV(float DeltaTime);
+
+	/* Automatic fire L93 */
+
+	FTimerHandle FireTimer;
+	bool bCanFire = true;
+
+	void StartFireTimer();
+	void FireTimerFinished();
+		
 
 public:	
 	
