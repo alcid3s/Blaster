@@ -35,6 +35,10 @@ public:
 
 	void PlayFireMontage(bool bAiming);
 
+	// L91
+	UFUNCTION(NetMulticast, Unreliable)
+		void MulticastHit();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,6 +59,9 @@ protected:
 
 	void FireButtonPressed();
 	void FireButtonReleased();
+
+	// L91
+	void PlayHitReactMontage();
 
 private:
 	UPROPERTY(VisibleAnywhere, category = Camera)
@@ -89,6 +96,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	class UAnimMontage* FireWeaponMontage;
+
+	/* L91 */
+	UPROPERTY(EditAnywhere, Category = Combat)
+		class UAnimMontage* HitReactMontage;
 
 	// L89
 	void HideCameraIfCharacterClose();
