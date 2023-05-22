@@ -5,11 +5,17 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Blaster/BlasterTypes/TurningInPlace.h"
+
+// L89
+#include "Blaster/Interfaces/InteractWithCrosshairsInterface.h"
+
+// last header to include
 #include "BlasterCharacter.generated.h"
 
 
+
 UCLASS()
-class BLASTER_API ABlasterCharacter : public ACharacter
+class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
@@ -29,6 +35,13 @@ public:
 
 	void PlayFireMontage(bool bAiming);
 
+	// L91
+	UFUNCTION(NetMulticast, Unreliable)
+		void MulticastHit();
+
+	// Lecture 92
+	virtual void OnRep_ReplicatedMovement() override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,10 +58,18 @@ protected:
 
 	void AimOffset(float DeltaTime);
 
+	void CalculateAO_Pitch();
+
+	// L92
+	void SimProxiesTurn();
+
 	virtual void Jump() override;
 
 	void FireButtonPressed();
 	void FireButtonReleased();
+
+	// L91
+	void PlayHitReactMontage();
 
 private:
 	UPROPERTY(VisibleAnywhere, category = Camera)
@@ -84,6 +105,25 @@ private:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	class UAnimMontage* FireWeaponMontage;
 
+	/* L91 */
+	UPROPERTY(EditAnywhere, Category = Combat)
+		class UAnimMontage* HitReactMontage;
+
+	// L89
+	void HideCameraIfCharacterClose();
+
+	UPROPERTY(EditAnywhere)
+		float CameraThreshold = 200.f;
+
+	// L92
+	bool bRotateRootBone;
+	float TurnThreshold = 0.5f;
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotation;
+	float ProxyYaw;
+	float TimeSinceLastMovementReplication;
+	float CalculateSpeed();
+
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped();
@@ -92,4 +132,7 @@ public:
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 	AWeapon* GetEquippedWeapon();
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace;  }
+	FVector GetHitTarget() const;
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera;  }
+	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone;  }
 };
